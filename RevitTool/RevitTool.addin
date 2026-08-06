@@ -1,0 +1,14 @@
+<RevitAddIns>
+    <AddIn Type="Application">
+        <Name>RevitTool</Name>
+        <Assembly>RevitTool\RevitTool.dll</Assembly>
+        <AddInId>799C0A4F-2095-4738-B480-AAE576977D9F</AddInId>
+        <FullClassName>RevitTool.Application</FullClassName>
+        <VendorId>Development</VendorId>
+        <VendorDescription></VendorDescription>
+    </AddIn>
+    <ManifestSettings>
+        <UseRevitContext>False</UseRevitContext>
+        <ContextName>RevitTool</ContextName>
+    </ManifestSettings>
+</RevitAddIns>
