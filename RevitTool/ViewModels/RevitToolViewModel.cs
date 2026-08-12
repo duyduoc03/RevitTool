@@ -126,19 +126,17 @@ namespace RevitTool.ViewModels
             RebarCount = rebarService.GetCount(rebars);
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanExportRebars))]
         private void ExportRebars()
         {
             ExportResult result = rebarService.ExportToExcel(RebarList);
 
             if (result.Success)
-            {
                 TaskDialog.Show("Export Rebar", result.Message + "\n\n" + result.FilePath);
-            }
             else
-            {
                 TaskDialog.Show("Export Rebar", result.Message);
-            }
         }
+
+        private bool CanExportRebars() => RebarList != null && RebarList.Count > 0;
     }
 }

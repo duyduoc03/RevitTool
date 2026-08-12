@@ -16,8 +16,8 @@ namespace RevitTool.Models
 
         public string HostName { get; set; }
 
-        public string Comments { get; set; }
-
         public string Level { get; set; }
+
+        public string Comments { get; set; }
     }
 }

@@ -14,8 +14,8 @@ namespace RevitTool.Models
 
         public double Volume { get; set; }
 
-        public string Comments { get; set; }
-
         public string Level { get; set; }
+
+        public string Comments { get; set; }
     }
 }
