@@ -47,5 +47,20 @@ namespace RevitTool.Services
         {
             return doors.Count;
         }
+
+        public List<FamilyTypeItem> GetDoorTypes(Document doc)
+        {
+            return new FilteredElementCollector(doc)
+                .OfCategory(BuiltInCategory.OST_Doors)
+                .WhereElementIsElementType()
+                .Cast<FamilySymbol>()
+                .Select(s => new FamilyTypeItem
+                {
+                    Id = s.Id,
+                    Name = $"{s.FamilyName} - {s.Name}"
+                })
+                .OrderBy(t => t.Name)
+                .ToList();
+        }
     }
 }

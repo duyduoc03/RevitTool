@@ -7,4 +7,9 @@
     <ActiveDebugProfile>Profile 1</ActiveDebugProfile>
     <_LastSelectedProfileId>C:\Users\Duoc\source\repos\RevitTool\RevitTool\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="Views\AddDoorView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

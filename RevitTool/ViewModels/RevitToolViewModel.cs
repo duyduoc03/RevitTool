@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using RevitTool.Models;
 using RevitTool.Services;
+using RevitTool.Views;
 using System.Collections.Generic;
 
 namespace RevitTool.ViewModels
@@ -78,6 +79,23 @@ namespace RevitTool.ViewModels
             DoorCount = doorService.GetCount(doors);
         }
 
+        [RelayCommand]
+        private void AddDoor()
+        {
+            try
+            {
+                var viewModel = new AddDoorViewModel(RefreshDoors);
+                var view = new AddDoorView(viewModel);
+
+                view.Show();
+                view.Activate();
+            }
+            catch (System.Exception ex)
+            {
+                TaskDialog.Show("Add Door", "Không thể mở cửa sổ Add Door.\n\n" + ex.Message);
+            }
+        }
+
         private readonly FurnitureService furnitureService = new();
 
         [ObservableProperty]
@@ -126,17 +144,19 @@ namespace RevitTool.ViewModels
             RebarCount = rebarService.GetCount(rebars);
         }
 
-        [RelayCommand(CanExecute = nameof(CanExportRebars))]
+        [RelayCommand]
         private void ExportRebars()
         {
             ExportResult result = rebarService.ExportToExcel(RebarList);
 
             if (result.Success)
+            {
                 TaskDialog.Show("Export Rebar", result.Message + "\n\n" + result.FilePath);
+            }
             else
+            {
                 TaskDialog.Show("Export Rebar", result.Message);
+            }
         }
-
-        private bool CanExportRebars() => RebarList != null && RebarList.Count > 0;
     }
 }
