@@ -4,19 +4,255 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:viewModel="clr-namespace:RevitTool.ViewModels"
+    xmlns:viewModel="clr-namespace:RevitTool.ViewModels;assembly=RevitTool"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance viewModel:RevitToolViewModel}"
+    d:DataContext="{d:DesignInstance viewModel:RevitToolViewModel, IsDesignTimeCreatable=False}"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen"
     Title="RevitTool"
-    Height="450"
-    Width="800">
-    <Grid>
+    Height="600"
+    Width="900">
+
+    <Grid Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
         <TextBlock
-            Text="RevitTool"
-            FontSize="60"
-            VerticalAlignment="Center"
-            HorizontalAlignment="Center" />
+            Grid.Row="0"
+            Margin="0,25,0,20"
+            HorizontalAlignment="Center"
+            FontSize="34"
+            FontWeight="SemiBold"
+            Text="RevitTool" />
+
+        <TabControl Grid.Row="1" Margin="20,0,20,20">
+            <TabItem Header="Walls">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,10,0,10">
+                        <Button
+                            DockPanel.Dock="Right"
+                            Width="100"
+                            Height="30"
+                            Content="Refresh"
+                            Command="{Binding RefreshWallsCommand}"
+                            Background="#D32F2F"
+                            BorderBrush="#D32F2F"
+                            Foreground="White" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="#666666"
+                            Text="{Binding WallCount, StringFormat='Tìm thấy {0} tường'}" />
+                    </DockPanel>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        ItemsSource="{Binding WallList}"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        GridLinesVisibility="Horizontal"
+                        HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="4*" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="1*" />
+                            <DataGridTextColumn Header="Length (m)" Binding="{Binding Length, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Area (m²)" Binding="{Binding Area, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Volume (m³)" Binding="{Binding Volume, StringFormat=F2}" Width="1*" />
+                            <DataGridTemplateColumn Header="" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Padding="8,4"
+                                            Content="View"
+                                            Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Doors">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,10,0,10">
+                        <Button
+                            DockPanel.Dock="Right"
+                            Width="100"
+                            Height="30"
+                            Content="Refresh"
+                            Command="{Binding RefreshDoorsCommand}"
+                            Background="#D32F2F"
+                            BorderBrush="#D32F2F"
+                            Foreground="White" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="#666666"
+                            Text="{Binding DoorCount, StringFormat='Tìm thấy {0} cửa'}" />
+                    </DockPanel>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        ItemsSource="{Binding DoorList}"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        GridLinesVisibility="Horizontal"
+                        HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3.5*" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="1.5*" />
+                            <DataGridTextColumn Header="Width (m)" Binding="{Binding Width, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Height (m)" Binding="{Binding Height, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Sill (m)" Binding="{Binding SillHeight, StringFormat=F2}" Width="1*" />
+                            <DataGridTemplateColumn Header="" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Padding="8,4"
+                                            Content="View"
+                                            Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Furniture">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,10,0,10">
+                        <Button
+                            DockPanel.Dock="Right"
+                            Width="100"
+                            Height="30"
+                            Content="Refresh"
+                            Command="{Binding RefreshFurnitureCommand}"
+                            Background="#D32F2F"
+                            BorderBrush="#D32F2F"
+                            Foreground="White" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="#666666"
+                            Text="{Binding FurnitureCount, StringFormat='Tìm thấy {0} nội thất'}" />
+                    </DockPanel>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        ItemsSource="{Binding FurnitureList}"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        GridLinesVisibility="Horizontal"
+                        HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3.5*" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="1.5*" />
+                            <DataGridTextColumn Header="Width (m)" Binding="{Binding Width, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Depth (m)" Binding="{Binding Depth, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Height (m)" Binding="{Binding Height, StringFormat=F2}" Width="1*" />
+                            <DataGridTemplateColumn Header="" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Padding="8,4"
+                                            Content="View"
+                                            Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Rebars">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,10,0,10">
+                        <Button
+                            DockPanel.Dock="Right"
+                            Width="100"
+                            Height="30"
+                            Content="Refresh"
+                            Command="{Binding RefreshFurnitureCommand}"
+                            Background="#D32F2F"
+                            BorderBrush="#D32F2F"
+                            Foreground="White" />
+
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="#666666"
+                            Text="{Binding FurnitureCount, StringFormat='Tìm thấy {0} nội thất'}" />
+                    </DockPanel>
+
+                    <DataGrid
+                        Grid.Row="1"
+                        ItemsSource="{Binding FurnitureList}"
+                        AutoGenerateColumns="False"
+                        IsReadOnly="True"
+                        CanUserAddRows="False"
+                        CanUserDeleteRows="False"
+                        GridLinesVisibility="Horizontal"
+                        HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="3.5*" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="1.5*" />
+                            <DataGridTextColumn Header="Width (m)" Binding="{Binding Width, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Depth (m)" Binding="{Binding Depth, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Height (m)" Binding="{Binding Height, StringFormat=F2}" Width="1*" />
+                            <DataGridTemplateColumn Header="" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Padding="8,4"
+                                            Content="View"
+                                            Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+
     </Grid>
 </Window>

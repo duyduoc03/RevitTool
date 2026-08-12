@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.Attributes;
 using Nice3point.Revit.Toolkit.External;
+using RevitTool.Services;
 using RevitTool.ViewModels;
 using RevitTool.Views;
 
@@ -16,7 +17,8 @@ namespace RevitTool.Commands
         {
             var viewModel = new RevitToolViewModel();
             var view = new RevitToolView(viewModel);
-            view.ShowDialog();
+
+            view.Show();
         }
     }
 }
