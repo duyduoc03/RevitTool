@@ -1,8 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Structure;
-using ClosedXML.Excel;
 using RevitTool.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +8,8 @@ namespace RevitTool.Services
 {
     public class RebarService
     {
+        private readonly ExcelExportService excelExportService = new();
+
         public List<RebarModel> GetRebars(Document doc)
         {
             List<RebarModel> result = new List<RebarModel>();
@@ -86,75 +86,14 @@ namespace RevitTool.Services
             return "N/A";
         }
 
-        public ExportResult ExportToExcel(List<RebarModel> rebars)
+        public ExportResult ExportToExcel(List<RebarModel> rebars, string filePath)
         {
-            if (rebars == null || rebars.Count == 0)
-            {
-                return new ExportResult
-                {
-                    Success = false,
-                    Message = "Không tìm thấy Rebar để xuất."
-                };
-            }
-
-            string filePath = System.IO.Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                "Rebar.xlsx");
-
-            try
-            {
-                using (XLWorkbook workbook = new XLWorkbook())
-                {
-                    var worksheet = workbook.Worksheets.Add("Rebar");
-
-                    worksheet.Cell(1, 1).Value = "Index";
-                    worksheet.Cell(1, 2).Value = "Element ID";
-                    worksheet.Cell(1, 3).Value = "Name";
-                    worksheet.Cell(1, 4).Value = "Shape Name";
-                    worksheet.Cell(1, 5).Value = "Diameter (mm)";
-                    worksheet.Cell(1, 6).Value = "Length (m)";
-                    worksheet.Cell(1, 7).Value = "Host Name";
-                    worksheet.Cell(1, 8).Value = "Level";
-                    worksheet.Cell(1, 9).Value = "Comments";
-
-                    int row = 2;
-                    int index = 1;
-
-                    foreach (RebarModel r in rebars)
-                    {
-                        worksheet.Cell(row, 1).Value = index;
-                        worksheet.Cell(row, 2).Value = r.Id.Value;
-                        worksheet.Cell(row, 3).Value = r.Name;
-                        worksheet.Cell(row, 4).Value = r.ShapeName;
-                        worksheet.Cell(row, 5).Value = r.Diameter;
-                        worksheet.Cell(row, 6).Value = r.Length;
-                        worksheet.Cell(row, 7).Value = r.HostName;
-                        worksheet.Cell(row, 8).Value = r.Level;
-                        worksheet.Cell(row, 9).Value = r.Comments;
-
-                        row++;
-                        index++;
-                    }
-
-                    worksheet.Columns().AdjustToContents();
-                    workbook.SaveAs(filePath);
-                }
-
-                return new ExportResult
-                {
-                    Success = true,
-                    FilePath = filePath,
-                    Message = "Đã xuất file thành công."
-                };
-            }
-            catch (Exception ex)
-            {
-                return new ExportResult
-                {
-                    Success = false,
-                    Message = "Không thể lưu file. Có thể file đang mở trong Excel.\n\n" + ex.Message
-                };
-            }
+            return excelExportService.Export(
+                rebars,
+                "Rebar",
+                filePath,
+                new[] { "Index", "Element ID", "Name", "Shape Name", "Diameter (mm)", "Length (m)", "Host Name", "Level", "Comments" },
+                r => new object[] { rebars.IndexOf(r) + 1, r.Id.Value, r.Name, r.ShapeName, r.Diameter, r.Length, r.HostName, r.Level, r.Comments });
         }
     }
 }

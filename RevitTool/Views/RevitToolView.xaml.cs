@@ -10,7 +10,7 @@ namespace RevitTool.Views
             DataContext = viewModel;
             InitializeComponent();
 
-            viewModel.RefreshWallsCommand.Execute(null);
+            viewModel.Walls.RefreshCommand.Execute(null);
         }
 
         private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -25,16 +25,16 @@ namespace RevitTool.Views
             switch (tabControl.SelectedIndex)
             {
                 case 0:
-                    viewModel.RefreshWallsCommand.Execute(null);
+                    viewModel.Walls.RefreshCommand.Execute(null);
                     break;
                 case 1:
-                    viewModel.RefreshDoorsCommand.Execute(null);
+                    viewModel.Doors.RefreshCommand.Execute(null);
                     break;
                 case 2:
-                    viewModel.RefreshFurnitureCommand.Execute(null);
+                    viewModel.Furniture.RefreshCommand.Execute(null);
                     break;
                 case 3:
-                    viewModel.RefreshRebarsCommand.Execute(null);
+                    viewModel.Rebars.RefreshCommand.Execute(null);
                     break;
             }
         }

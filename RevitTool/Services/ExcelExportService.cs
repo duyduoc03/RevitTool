@@ -2,7 +2,6 @@
 using RevitTool.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 
 namespace RevitTool.Services
 {
@@ -11,7 +10,7 @@ namespace RevitTool.Services
         public ExportResult Export<T>(
             List<T> items,
             string sheetName,
-            string fileName,
+            string filePath,
             string[] headers,
             Func<T, object[]> rowMapper)
         {
@@ -24,9 +23,14 @@ namespace RevitTool.Services
                 };
             }
 
-            string filePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Desktop),
-                fileName);
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                return new ExportResult
+                {
+                    Success = false,
+                    Message = "Đường dẫn lưu file không hợp lệ."
+                };
+            }
 
             try
             {
@@ -34,14 +38,20 @@ namespace RevitTool.Services
                 var ws = workbook.Worksheets.Add(sheetName);
 
                 for (int c = 0; c < headers.Length; c++)
+                {
                     ws.Cell(1, c + 1).Value = headers[c];
+                }
 
                 int row = 2;
-                foreach (var item in items)
+                foreach (T item in items)
                 {
                     object[] values = rowMapper(item);
+
                     for (int c = 0; c < values.Length; c++)
+                    {
                         ws.Cell(row, c + 1).Value = XLCellValue.FromObject(values[c]);
+                    }
+
                     row++;
                 }
 

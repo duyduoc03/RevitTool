@@ -90,7 +90,25 @@ namespace RevitTool.ViewModels
         [RelayCommand]
         private void ExportRebars()
         {
-            ExportResult result = rebarService.ExportToExcel(Rebars.Items);
+            if (Rebars.Items == null || Rebars.Items.Count == 0)
+            {
+                TaskDialog.Show("Export Rebar", "Không tìm thấy Rebar để xuất.");
+                return;
+            }
+
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                FileName = "Rebar.xlsx",
+                DefaultExt = ".xlsx",
+                Filter = "Excel Files (*.xlsx)|*.xlsx"
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return;
+            }
+
+            ExportResult result = rebarService.ExportToExcel(Rebars.Items, dialog.FileName);
 
             if (result.Success)
             {
