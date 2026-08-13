@@ -14,9 +14,16 @@ namespace RevitTool.ViewModels
         private readonly SelectElementHandler selectElementHandler = new();
         private readonly ExternalEvent selectElementEvent;
 
+        private readonly PlaceFamilyInstanceHandler placeFamilyInstanceHandler = new();
+        private readonly ExternalEvent placeFamilyInstanceEvent;
+
         public RevitToolViewModel()
         {
+            // ExternalEvent.Create bắt buộc phải chạy trong ngữ cảnh API hợp lệ
+            // (đang chạy vì đây là constructor được gọi trong StartupCommand.Execute()).
+            // Tạo 1 lần duy nhất ở đây, dùng lại cho mọi cửa sổ Add mở sau này.
             selectElementEvent = ExternalEvent.Create(selectElementHandler);
+            placeFamilyInstanceEvent = ExternalEvent.Create(placeFamilyInstanceHandler);
         }
 
         [RelayCommand]
@@ -84,7 +91,7 @@ namespace RevitTool.ViewModels
         {
             try
             {
-                var viewModel = new AddDoorViewModel(RefreshDoors);
+                var viewModel = new AddDoorViewModel(placeFamilyInstanceHandler, placeFamilyInstanceEvent, RefreshDoors);
                 var view = new AddDoorView(viewModel);
 
                 view.Show();

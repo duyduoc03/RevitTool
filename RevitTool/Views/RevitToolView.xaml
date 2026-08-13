@@ -27,7 +27,7 @@
             FontWeight="SemiBold"
             Text="RevitTool" />
 
-        <TabControl Grid.Row="1" Margin="20,0,20,20">
+        <TabControl Grid.Row="1" Margin="20,0,20,20" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Walls">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>

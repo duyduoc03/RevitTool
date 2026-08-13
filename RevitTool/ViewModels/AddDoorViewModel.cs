@@ -12,16 +12,15 @@ namespace RevitTool.ViewModels
     public sealed partial class AddDoorViewModel : ObservableObject
     {
         private readonly DoorService doorService = new();
-        private readonly PlaceFamilyInstanceHandler placeHandler = new();
+        private readonly PlaceFamilyInstanceHandler placeHandler;
         private readonly ExternalEvent placeEvent;
         private readonly Action onPlaced;
 
-        public AddDoorViewModel(Action onPlaced = null)
+        public AddDoorViewModel(PlaceFamilyInstanceHandler placeHandler, ExternalEvent placeEvent, Action onPlaced = null)
         {
+            this.placeHandler = placeHandler;
+            this.placeEvent = placeEvent;
             this.onPlaced = onPlaced;
-
-            placeHandler.OnCompleted = OnPlacementCompleted;
-            placeEvent = ExternalEvent.Create(placeHandler);
 
             LoadTypes();
         }
@@ -52,6 +51,9 @@ namespace RevitTool.ViewModels
         {
             IsPlacing = true;
 
+            // Gán callback ngay trước khi Raise vì handler dùng chung cho mọi cửa sổ Add
+            // (Door/Furniture...), tránh trường hợp 2 cửa sổ mở song song ghi đè callback của nhau.
+            placeHandler.OnCompleted = OnPlacementCompleted;
             placeHandler.FamilyTypeId = SelectedDoorType.Id;
             placeEvent.Raise();
         }
