@@ -1,15 +1,15 @@
 ﻿<Window
-    x:Class="RevitTool.Views.AddDoorView"
+    x:Class="RevitTool.Views.AddFamilyInstanceView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:viewModel="clr-namespace:RevitTool.ViewModels;assembly=RevitTool"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance viewModel:AddDoorViewModel, IsDesignTimeCreatable=False}"
+    d:DataContext="{d:DesignInstance viewModel:AddFamilyInstanceViewModel, IsDesignTimeCreatable=False}"
     ResizeMode="NoResize"
     WindowStartupLocation="CenterScreen"
-    Title="Add Door"
+    Title="{Binding Title}"
     Height="200"
     Width="380">
 
@@ -25,13 +25,13 @@
             Margin="0,0,0,6"
             FontSize="13"
             FontWeight="SemiBold"
-            Text="Chọn loại cửa" />
+            Text="Chọn loại" />
 
         <ComboBox
             Grid.Row="1"
             Height="30"
-            ItemsSource="{Binding DoorTypes}"
-            SelectedItem="{Binding SelectedDoorType}"
+            ItemsSource="{Binding Types}"
+            SelectedItem="{Binding SelectedType}"
             DisplayMemberPath="Name" />
 
         <Button

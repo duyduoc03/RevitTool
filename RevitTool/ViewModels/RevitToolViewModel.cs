@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using RevitTool.Models;
 using RevitTool.Services;
 using RevitTool.Views;
-using System.Collections.Generic;
+using System;
 
 namespace RevitTool.ViewModels
 {
@@ -17,13 +17,23 @@ namespace RevitTool.ViewModels
         private readonly PlaceFamilyInstanceHandler placeFamilyInstanceHandler = new();
         private readonly ExternalEvent placeFamilyInstanceEvent;
 
+        private readonly WallService wallService = new();
+        private readonly DoorService doorService = new();
+        private readonly FurnitureService furnitureService = new();
+        private readonly RebarService rebarService = new();
+
         public RevitToolViewModel()
         {
             // ExternalEvent.Create bắt buộc phải chạy trong ngữ cảnh API hợp lệ
             // (đang chạy vì đây là constructor được gọi trong StartupCommand.Execute()).
-            // Tạo 1 lần duy nhất ở đây, dùng lại cho mọi cửa sổ Add mở sau này.
+            // Tạo 1 lần duy nhất ở đây, dùng lại cho mọi cửa sổ Add mở sau này (Door/Furniture/Beam...).
             selectElementEvent = ExternalEvent.Create(selectElementHandler);
             placeFamilyInstanceEvent = ExternalEvent.Create(placeFamilyInstanceHandler);
+
+            Walls = new ElementTabViewModel<WallModel>(wallService.GetWalls);
+            Doors = new ElementTabViewModel<DoorModel>(doorService.GetDoors);
+            Furniture = new ElementTabViewModel<FurnitureModel>(furnitureService.GetFurniture);
+            Rebars = new ElementTabViewModel<RebarModel>(rebarService.GetRebars);
         }
 
         [RelayCommand]
@@ -38,123 +48,49 @@ namespace RevitTool.ViewModels
             selectElementEvent.Raise();
         }
 
-        private readonly WallService wallService = new();
+        public ElementTabViewModel<WallModel> Walls { get; }
 
-        [ObservableProperty]
-        private List<WallModel> wallList = new();
+        public ElementTabViewModel<DoorModel> Doors { get; }
 
-        [ObservableProperty]
-        private int wallCount;
+        public ElementTabViewModel<FurnitureModel> Furniture { get; }
 
-        [RelayCommand]
-        private void RefreshWalls()
-        {
-            Document doc = Context.ActiveDocument;
-
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<WallModel> walls = wallService.GetWalls(doc);
-
-            WallList = walls;
-            WallCount = wallService.GetCount(walls);
-        }
-
-        private readonly DoorService doorService = new();
-
-        [ObservableProperty]
-        private List<DoorModel> doorList = new();
-
-        [ObservableProperty]
-        private int doorCount;
-
-        [RelayCommand]
-        private void RefreshDoors()
-        {
-            Document doc = Context.ActiveDocument;
-
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<DoorModel> doors = doorService.GetDoors(doc);
-
-            DoorList = doors;
-            DoorCount = doorService.GetCount(doors);
-        }
+        public ElementTabViewModel<RebarModel> Rebars { get; }
 
         [RelayCommand]
         private void AddDoor()
         {
+            OpenAddWindow(BuiltInCategory.OST_Doors, "Add Door", () => Doors.RefreshCommand.Execute(null));
+        }
+
+        [RelayCommand]
+        private void AddFurniture()
+        {
+            OpenAddWindow(BuiltInCategory.OST_Furniture, "Add Furniture", () => Furniture.RefreshCommand.Execute(null));
+        }
+
+        // Sau này thêm Beam/Column chỉ cần thêm 1 command tương tự, gọi OpenAddWindow
+        // với BuiltInCategory.OST_StructuralFraming / OST_StructuralColumns - không cần View/ViewModel mới.
+
+        private void OpenAddWindow(BuiltInCategory category, string title, Action onPlaced)
+        {
             try
             {
-                var viewModel = new AddDoorViewModel(placeFamilyInstanceHandler, placeFamilyInstanceEvent, RefreshDoors);
-                var view = new AddDoorView(viewModel);
+                var viewModel = new AddFamilyInstanceViewModel(category, title, placeFamilyInstanceHandler, placeFamilyInstanceEvent, onPlaced);
+                var view = new AddFamilyInstanceView(viewModel);
 
                 view.Show();
                 view.Activate();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                TaskDialog.Show("Add Door", "Không thể mở cửa sổ Add Door.\n\n" + ex.Message);
+                TaskDialog.Show(title, "Không thể mở cửa sổ.\n\n" + ex.Message);
             }
-        }
-
-        private readonly FurnitureService furnitureService = new();
-
-        [ObservableProperty]
-        private List<FurnitureModel> furnitureList = new();
-
-        [ObservableProperty]
-        private int furnitureCount;
-
-        [RelayCommand]
-        private void RefreshFurniture()
-        {
-            Document doc = Context.ActiveDocument;
-
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<FurnitureModel> furniture = furnitureService.GetFurniture(doc);
-
-            FurnitureList = furniture;
-            FurnitureCount = furnitureService.GetCount(furniture);
-        }
-
-        private readonly RebarService rebarService = new();
-
-        [ObservableProperty]
-        private List<RebarModel> rebarList = new();
-
-        [ObservableProperty]
-        private int rebarCount;
-
-        [RelayCommand]
-        private void RefreshRebars()
-        {
-            Document doc = Context.ActiveDocument;
-
-            if (doc == null)
-            {
-                return;
-            }
-
-            List<RebarModel> rebars = rebarService.GetRebars(doc);
-
-            RebarList = rebars;
-            RebarCount = rebarService.GetCount(rebars);
         }
 
         [RelayCommand]
         private void ExportRebars()
         {
-            ExportResult result = rebarService.ExportToExcel(RebarList);
+            ExportResult result = rebarService.ExportToExcel(Rebars.Items);
 
             if (result.Success)
             {

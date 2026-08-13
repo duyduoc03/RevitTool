@@ -2,9 +2,9 @@
 
 namespace RevitTool.Views
 {
-    public sealed partial class AddDoorView
+    public sealed partial class AddFamilyInstanceView
     {
-        public AddDoorView(AddDoorViewModel viewModel)
+        public AddFamilyInstanceView(AddFamilyInstanceViewModel viewModel)
         {
             DataContext = viewModel;
             InitializeComponent();

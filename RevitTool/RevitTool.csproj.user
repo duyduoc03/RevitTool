@@ -8,7 +8,7 @@
     <_LastSelectedProfileId>C:\Users\Duoc\source\repos\RevitTool\RevitTool\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Update="Views\AddDoorView.xaml.cs">
+    <Compile Update="Views\AddFamilyInstanceView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

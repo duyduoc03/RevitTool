@@ -35,17 +35,12 @@ namespace RevitTool.Services
                     Length = UnitUtils.ConvertFromInternalUnits(lengthFeet, UnitTypeId.Meters),
                     Area = UnitUtils.ConvertFromInternalUnits(areaFeet, UnitTypeId.SquareMeters),
                     Volume = UnitUtils.ConvertFromInternalUnits(volumeFeet, UnitTypeId.CubicMeters),
-                    Comments = commentsParam?.AsString() ?? "",
-                    Level = doc.GetElement(w.LevelId)?.Name ?? "N/A"
+                    Level = doc.GetElement(w.LevelId)?.Name ?? "N/A",
+                    Comments = commentsParam?.AsString() ?? ""
                 });
             }
 
             return result;
-        }
-
-        public int GetCount(List<WallModel> walls)
-        {
-            return walls.Count;
         }
     }
 }

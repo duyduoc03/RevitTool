@@ -35,17 +35,12 @@ namespace RevitTool.Services
                     Width = UnitUtils.ConvertFromInternalUnits(widthFeet, UnitTypeId.Meters),
                     Depth = UnitUtils.ConvertFromInternalUnits(depthFeet, UnitTypeId.Meters),
                     Height = UnitUtils.ConvertFromInternalUnits(heightFeet, UnitTypeId.Meters),
-                    Comments = commentsParam?.AsString() ?? "",
-                    Level = doc.GetElement(f.LevelId)?.Name ?? "N/A"
+                    Level = doc.GetElement(f.LevelId)?.Name ?? "N/A",
+                    Comments = commentsParam?.AsString() ?? ""
                 });
             }
 
             return result;
-        }
-
-        public int GetCount(List<FurnitureModel> items)
-        {
-            return items.Count;
         }
     }
 }

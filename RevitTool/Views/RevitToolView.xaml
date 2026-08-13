@@ -41,7 +41,7 @@
                             Width="100"
                             Height="30"
                             Content="Refresh"
-                            Command="{Binding RefreshWallsCommand}"
+                            Command="{Binding Walls.RefreshCommand}"
                             Background="#D32F2F"
                             BorderBrush="#D32F2F"
                             Foreground="White" />
@@ -50,12 +50,12 @@
                             VerticalAlignment="Center"
                             FontSize="13"
                             Foreground="#666666"
-                            Text="{Binding WallCount, StringFormat='Tìm thấy {0} tường'}" />
+                            Text="{Binding Walls.Count, StringFormat='Tìm thấy {0} tường'}" />
                     </DockPanel>
 
                     <DataGrid
                         Grid.Row="1"
-                        ItemsSource="{Binding WallList}"
+                        ItemsSource="{Binding Walls.Items}"
                         AutoGenerateColumns="False"
                         IsReadOnly="True"
                         CanUserAddRows="False"
@@ -108,7 +108,7 @@
                                 Width="100"
                                 Height="30"
                                 Content="Refresh"
-                                Command="{Binding RefreshDoorsCommand}"
+                                Command="{Binding Doors.RefreshCommand}"
                                 Background="#D32F2F"
                                 BorderBrush="#D32F2F"
                                 Foreground="White" />
@@ -118,12 +118,12 @@
                             VerticalAlignment="Center"
                             FontSize="13"
                             Foreground="#666666"
-                            Text="{Binding DoorCount, StringFormat='Tìm thấy {0} cửa'}" />
+                            Text="{Binding Doors.Count, StringFormat='Tìm thấy {0} cửa'}" />
                     </DockPanel>
 
                     <DataGrid
                         Grid.Row="1"
-                        ItemsSource="{Binding DoorList}"
+                        ItemsSource="{Binding Doors.Items}"
                         AutoGenerateColumns="False"
                         IsReadOnly="True"
                         CanUserAddRows="False"
@@ -161,26 +161,37 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,10,0,10">
-                        <Button
-                            DockPanel.Dock="Right"
-                            Width="100"
-                            Height="30"
-                            Content="Refresh"
-                            Command="{Binding RefreshFurnitureCommand}"
-                            Background="#D32F2F"
-                            BorderBrush="#D32F2F"
-                            Foreground="White" />
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button
+                                Width="100"
+                                Height="30"
+                                Margin="0,0,10,0"
+                                Content="Add"
+                                Command="{Binding AddFurnitureCommand}"
+                                Background="#2E7D32"
+                                BorderBrush="#2E7D32"
+                                Foreground="White" />
+
+                            <Button
+                                Width="100"
+                                Height="30"
+                                Content="Refresh"
+                                Command="{Binding Furniture.RefreshCommand}"
+                                Background="#D32F2F"
+                                BorderBrush="#D32F2F"
+                                Foreground="White" />
+                        </StackPanel>
 
                         <TextBlock
                             VerticalAlignment="Center"
                             FontSize="13"
                             Foreground="#666666"
-                            Text="{Binding FurnitureCount, StringFormat='Tìm thấy {0} nội thất'}" />
+                            Text="{Binding Furniture.Count, StringFormat='Tìm thấy {0} nội thất'}" />
                     </DockPanel>
 
                     <DataGrid
                         Grid.Row="1"
-                        ItemsSource="{Binding FurnitureList}"
+                        ItemsSource="{Binding Furniture.Items}"
                         AutoGenerateColumns="False"
                         IsReadOnly="True"
                         CanUserAddRows="False"
@@ -233,7 +244,7 @@
                                 Width="100"
                                 Height="30"
                                 Content="Refresh"
-                                Command="{Binding RefreshRebarsCommand}"
+                                Command="{Binding Rebars.RefreshCommand}"
                                 Background="#D32F2F"
                                 BorderBrush="#D32F2F"
                                 Foreground="White" />
@@ -243,12 +254,12 @@
                             VerticalAlignment="Center"
                             FontSize="13"
                             Foreground="#666666"
-                            Text="{Binding RebarCount, StringFormat='Tìm thấy {0} thanh thép'}" />
+                            Text="{Binding Rebars.Count, StringFormat='Tìm thấy {0} thanh thép'}" />
                     </DockPanel>
 
                     <DataGrid
                         Grid.Row="1"
-                        ItemsSource="{Binding RebarList}"
+                        ItemsSource="{Binding Rebars.Items}"
                         AutoGenerateColumns="False"
                         IsReadOnly="True"
                         CanUserAddRows="False"

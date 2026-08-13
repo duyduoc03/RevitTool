@@ -35,32 +35,12 @@ namespace RevitTool.Services
                     Width = UnitUtils.ConvertFromInternalUnits(widthFeet, UnitTypeId.Meters),
                     Height = UnitUtils.ConvertFromInternalUnits(heightFeet, UnitTypeId.Meters),
                     SillHeight = UnitUtils.ConvertFromInternalUnits(sillFeet, UnitTypeId.Meters),
-                    Comments = commentsParam?.AsString() ?? "",
-                    Level = doc.GetElement(d.LevelId)?.Name ?? "N/A"
+                    Level = doc.GetElement(d.LevelId)?.Name ?? "N/A",
+                    Comments = commentsParam?.AsString() ?? ""
                 });
             }
 
             return result;
-        }
-
-        public int GetCount(List<DoorModel> doors)
-        {
-            return doors.Count;
-        }
-
-        public List<FamilyTypeItem> GetDoorTypes(Document doc)
-        {
-            return new FilteredElementCollector(doc)
-                .OfCategory(BuiltInCategory.OST_Doors)
-                .WhereElementIsElementType()
-                .Cast<FamilySymbol>()
-                .Select(s => new FamilyTypeItem
-                {
-                    Id = s.Id,
-                    Name = $"{s.FamilyName} - {s.Name}"
-                })
-                .OrderBy(t => t.Name)
-                .ToList();
         }
     }
 }
