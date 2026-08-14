@@ -19,13 +19,24 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            Grid.Row="0"
-            Margin="0,25,0,20"
-            HorizontalAlignment="Center"
-            FontSize="34"
-            FontWeight="SemiBold"
-            Text="RevitTool" />
+        <Grid Grid.Row="0" Margin="20,25,20,20">
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="34"
+                FontWeight="SemiBold"
+                Text="RevitTool" />
+
+            <Button
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Width="140"
+                Height="32"
+                Content="Create Sheet"
+                Command="{Binding CreateSheetCommand}"
+                Background="#4C7194"
+                BorderBrush="#4C7194"
+                Foreground="White" />
+        </Grid>
 
         <TabControl Grid.Row="1" Margin="20,0,20,20" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Walls">
@@ -36,8 +47,18 @@
                     </Grid.RowDefinitions>
 
                     <DockPanel Grid.Row="0" Margin="0,10,0,10">
-                        <Button
-                            DockPanel.Dock="Right"
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button
+                            Width="100"
+                            Height="30"
+                            Margin="0,0,10,0"
+                            Content="Add"
+                            Command="{Binding AddWallCommand}"
+                            Background="#2E7D32"
+                            BorderBrush="#2E7D32"
+                            Foreground="White" />
+
+                            <Button
                             Width="100"
                             Height="30"
                             Content="Refresh"
@@ -45,6 +66,7 @@
                             Background="#D32F2F"
                             BorderBrush="#D32F2F"
                             Foreground="White" />
+                        </StackPanel>
 
                         <TextBlock
                             VerticalAlignment="Center"
@@ -77,6 +99,143 @@
                                             Content="View"
                                             Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Columns">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,10,0,10">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button
+                Width="100"
+                Height="30"
+                Margin="0,0,10,0"
+                Content="Add"
+                Command="{Binding AddColumnCommand}"
+                Background="#2E7D32"
+                BorderBrush="#2E7D32"
+                Foreground="White" />
+
+                            <Button
+                Width="100"
+                Height="30"
+                Content="Refresh"
+                Command="{Binding Columns.RefreshCommand}"
+                Background="#D32F2F"
+                BorderBrush="#D32F2F"
+                Foreground="White" />
+                        </StackPanel>
+
+                        <TextBlock
+                VerticalAlignment="Center"
+                FontSize="13"
+                Foreground="#666666"
+                Text="{Binding Columns.Count, StringFormat='Tìm thấy {0} cột'}" />
+                    </DockPanel>
+
+                    <DataGrid
+            Grid.Row="1"
+            ItemsSource="{Binding Columns.Items}"
+            AutoGenerateColumns="False"
+            IsReadOnly="True"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False"
+            GridLinesVisibility="Horizontal"
+            HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="1*" />
+                            <DataGridTextColumn Header="Width (m)" Binding="{Binding Width, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Depth (m)" Binding="{Binding Depth, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Height (m)" Binding="{Binding Height, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Material" Binding="{Binding Material}" Width="1.5*" />
+                            <DataGridTextColumn Header="Comments" Binding="{Binding Comments}" Width="1.5*" />
+                            <DataGridTemplateColumn Header="" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                Padding="8,4"
+                                Content="View"
+                                Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Beams">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <DockPanel Grid.Row="0" Margin="0,10,0,10">
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button
+    Width="100"
+    Height="30"
+    Margin="0,0,10,0"
+    Content="Add"
+    Command="{Binding AddBeamCommand}"
+    Background="#2E7D32"
+    BorderBrush="#2E7D32"
+    Foreground="White" />
+
+                            <Button
+    Width="100"
+    Height="30"
+    Content="Refresh"
+    Command="{Binding Beams.RefreshCommand}"
+    Background="#D32F2F"
+    BorderBrush="#D32F2F"
+    Foreground="White" />
+                        </StackPanel>
+
+                        <TextBlock
+    VerticalAlignment="Center"
+    FontSize="13"
+    Foreground="#666666"
+    Text="{Binding Beams.Count, StringFormat='Tìm thấy {0} dầm'}" />
+                    </DockPanel>
+
+                    <DataGrid
+Grid.Row="1"
+ItemsSource="{Binding Beams.Items}"
+AutoGenerateColumns="False"
+IsReadOnly="True"
+CanUserAddRows="False"
+CanUserDeleteRows="False"
+GridLinesVisibility="Horizontal"
+HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="1*" />
+                            <DataGridTextColumn Header="Width (m)" Binding="{Binding Width, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Height (m)" Binding="{Binding Height, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Length (m)" Binding="{Binding Length, StringFormat=F2}" Width="1*" />
+                            <DataGridTextColumn Header="Material" Binding="{Binding Material}" Width="1.5*" />
+                            <DataGridTextColumn Header="Comments" Binding="{Binding Comments}" Width="1.5*" />
+                            <DataGridTemplateColumn Header="" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button
+                    Padding="8,4"
+                    Content="View"
+                    Command="{Binding DataContext.SelectElementCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    CommandParameter="{Binding}" />
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

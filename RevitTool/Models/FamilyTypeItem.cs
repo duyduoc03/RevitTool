@@ -4,8 +4,8 @@ namespace RevitTool.Models
 {
     public class FamilyTypeItem
     {
-        public ElementId Id { get; set; }
+        public required ElementId Id { get; init; }
 
-        public string Name { get; set; }
+        public required string Name { get; init; }
     }
 }

@@ -1,0 +1,46 @@
+﻿<Window
+    x:Class="RevitTool.Views.CreateSheetView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:viewModel="clr-namespace:RevitTool.ViewModels;assembly=RevitTool"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance viewModel:CreateSheetViewModel, IsDesignTimeCreatable=False}"
+    ResizeMode="NoResize"
+    WindowStartupLocation="CenterScreen"
+    Title="Create Sheet"
+    Height="200"
+    Width="380">
+
+    <Grid Margin="20" Background="#F5F5F5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Grid.Row="0"
+            Margin="0,0,0,6"
+            FontSize="13"
+            FontWeight="SemiBold"
+            Text="Tên Sheet" />
+
+        <TextBox
+            Grid.Row="1"
+            Height="30"
+            VerticalContentAlignment="Center"
+            Text="{Binding SheetName, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Button
+            Grid.Row="2"
+            Margin="0,20,0,0"
+            Height="34"
+            Content="Tạo"
+            Command="{Binding CreateCommand}"
+            Background="#4C7194"
+            BorderBrush="#4C7194"
+            Foreground="White" />
+    </Grid>
+</Window>

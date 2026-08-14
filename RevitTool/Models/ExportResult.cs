@@ -1,11 +1,11 @@
 ﻿namespace RevitTool.Models
 {
-    public class ExportResult
+    public sealed class ExportResult
     {
-        public bool Success { get; set; }
+        public bool Success { get; init; }
 
-        public string FilePath { get; set; }
+        public string? FilePath { get; init; }
 
-        public string Message { get; set; }
+        public required string Message { get; init; }
     }
 }

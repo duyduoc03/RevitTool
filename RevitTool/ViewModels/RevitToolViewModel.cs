@@ -17,7 +17,12 @@ namespace RevitTool.ViewModels
         private readonly PlaceFamilyInstanceHandler placeFamilyInstanceHandler = new();
         private readonly ExternalEvent placeFamilyInstanceEvent;
 
+        private readonly CreateSheetHandler createSheetHandler = new();
+        private readonly ExternalEvent createSheetEvent;
+
         private readonly WallService wallService = new();
+        private readonly ColumnService columnService = new();
+        private readonly BeamService beamService = new();
         private readonly DoorService doorService = new();
         private readonly FurnitureService furnitureService = new();
         private readonly RebarService rebarService = new();
@@ -29,8 +34,11 @@ namespace RevitTool.ViewModels
             // Tạo 1 lần duy nhất ở đây, dùng lại cho mọi cửa sổ Add mở sau này (Door/Furniture/Beam...).
             selectElementEvent = ExternalEvent.Create(selectElementHandler);
             placeFamilyInstanceEvent = ExternalEvent.Create(placeFamilyInstanceHandler);
+            createSheetEvent = ExternalEvent.Create(createSheetHandler);
 
             Walls = new ElementTabViewModel<WallModel>(wallService.GetWalls);
+            Columns = new ElementTabViewModel<ColumnModel>(columnService.GetColumns);
+            Beams = new ElementTabViewModel<BeamModel>(beamService.GetBeams);
             Doors = new ElementTabViewModel<DoorModel>(doorService.GetDoors);
             Furniture = new ElementTabViewModel<FurnitureModel>(furnitureService.GetFurniture);
             Rebars = new ElementTabViewModel<RebarModel>(rebarService.GetRebars);
@@ -50,11 +58,33 @@ namespace RevitTool.ViewModels
 
         public ElementTabViewModel<WallModel> Walls { get; }
 
+        public ElementTabViewModel<ColumnModel> Columns { get; }
+
+        public ElementTabViewModel<BeamModel> Beams { get; }
+
         public ElementTabViewModel<DoorModel> Doors { get; }
 
         public ElementTabViewModel<FurnitureModel> Furniture { get; }
 
         public ElementTabViewModel<RebarModel> Rebars { get; }
+
+        [RelayCommand]
+        private void AddWall()
+        {
+            OpenAddWindow(BuiltInCategory.OST_Walls, "Add Wall", () => Walls.RefreshCommand.Execute(null));
+        }
+
+        [RelayCommand]
+        private void AddColumn()
+        {
+            OpenAddWindow(BuiltInCategory.OST_StructuralColumns, "Add Column", () => Columns.RefreshCommand.Execute(null));
+        }
+
+        [RelayCommand]
+        private void AddBeam()
+        {
+            OpenAddWindow(BuiltInCategory.OST_StructuralFraming, "Add Beam", () => Beams.RefreshCommand.Execute(null));
+        }
 
         [RelayCommand]
         private void AddDoor()
@@ -68,8 +98,27 @@ namespace RevitTool.ViewModels
             OpenAddWindow(BuiltInCategory.OST_Furniture, "Add Furniture", () => Furniture.RefreshCommand.Execute(null));
         }
 
-        // Sau này thêm Beam/Column chỉ cần thêm 1 command tương tự, gọi OpenAddWindow
-        // với BuiltInCategory.OST_StructuralFraming / OST_StructuralColumns - không cần View/ViewModel mới.
+
+        [RelayCommand]
+        private void CreateSheet()
+        {
+            try
+            {
+                var viewModel = new CreateSheetViewModel(createSheetHandler, createSheetEvent);
+                var view = new CreateSheetView(viewModel);
+
+                view.Show();
+                view.Activate();
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(
+                    "Không thể mở cửa sổ Create Sheet.\n\n" + ex.Message,
+                    "Create Sheet",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
+        }
 
         private void OpenAddWindow(BuiltInCategory category, string title, Action onPlaced)
         {

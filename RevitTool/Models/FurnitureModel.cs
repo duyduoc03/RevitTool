@@ -4,18 +4,18 @@ namespace RevitTool.Models
 {
     public class FurnitureModel : IElementModel
     {
-        public ElementId Id { get; set; }
+        public required ElementId Id { get; init; }
 
-        public string Name { get; set; }
+        public required string Name { get; init; }
 
-        public double Width { get; set; }
+        public double Width { get; init; }
 
-        public double Depth { get; set; }
+        public double Depth { get; init; }
 
-        public double Height { get; set; }
+        public double Height { get; init; }
 
-        public string Level { get; set; }
+        public required string Level { get; init; }
 
-        public string Comments { get; set; }
+        public string? Comments { get; init; }
     }
 }

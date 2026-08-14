@@ -1,18 +1,20 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 
 namespace RevitTool.Models
 {
-    public class WallModel : IElementModel
+    public class ColumnModel : IElementModel
     {
         public required ElementId Id { get; init; }
 
         public required string Name { get; init; }
 
-        public double Length { get; init; }
+        public double Width { get; init; }
 
-        public double Area { get; init; }
+        public double Height { get; init; }
 
-        public double Volume { get; init; }
+        public double Depth { get; init; }
+
+        public string? Material { get; init; }
 
         public required string Level { get; init; }
 

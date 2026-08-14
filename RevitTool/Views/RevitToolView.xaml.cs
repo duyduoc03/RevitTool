@@ -28,12 +28,18 @@ namespace RevitTool.Views
                     viewModel.Walls.RefreshCommand.Execute(null);
                     break;
                 case 1:
-                    viewModel.Doors.RefreshCommand.Execute(null);
+                    viewModel.Columns.RefreshCommand.Execute(null);
                     break;
                 case 2:
-                    viewModel.Furniture.RefreshCommand.Execute(null);
+                    viewModel.Beams.RefreshCommand.Execute(null);
                     break;
                 case 3:
+                    viewModel.Doors.RefreshCommand.Execute(null);
+                    break;
+                case 4:
+                    viewModel.Furniture.RefreshCommand.Execute(null);
+                    break;
+                case 5:
                     viewModel.Rebars.RefreshCommand.Execute(null);
                     break;
             }
