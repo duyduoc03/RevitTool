@@ -83,7 +83,11 @@ namespace RevitTool.ViewModels
             }
             catch (Exception ex)
             {
-                TaskDialog.Show(title, "Không thể mở cửa sổ.\n\n" + ex.Message);
+                System.Windows.MessageBox.Show(
+                    "Không thể mở cửa sổ.\n\n" + ex.Message,
+                    title,
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
 
@@ -92,7 +96,11 @@ namespace RevitTool.ViewModels
         {
             if (Rebars.Items == null || Rebars.Items.Count == 0)
             {
-                TaskDialog.Show("Export Rebar", "Không tìm thấy Rebar để xuất.");
+                System.Windows.MessageBox.Show(
+                    "Không tìm thấy Rebar để xuất.",
+                    "Export Rebar",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
                 return;
             }
 
@@ -112,11 +120,19 @@ namespace RevitTool.ViewModels
 
             if (result.Success)
             {
-                TaskDialog.Show("Export Rebar", result.Message + "\n\n" + result.FilePath);
+                System.Windows.MessageBox.Show(
+                    result.Message + "\n\n" + result.FilePath,
+                    "Export Rebar",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
             }
             else
             {
-                TaskDialog.Show("Export Rebar", result.Message);
+                System.Windows.MessageBox.Show(
+                    result.Message,
+                    "Export Rebar",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
     }
