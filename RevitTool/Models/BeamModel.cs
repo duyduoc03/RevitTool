@@ -18,8 +18,6 @@ namespace RevitTool.Models
 
         public string? Material { get; init; }
 
-        public required string Level { get; init; }
-
         public string? Comments { get; init; }
     }
 }

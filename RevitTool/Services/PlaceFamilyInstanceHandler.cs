@@ -1,6 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace RevitTool.Services
@@ -33,6 +35,8 @@ namespace RevitTool.Services
                 return;
             }
 
+            HashSet<ElementId> existingInstanceIds = new();
+
             try
             {
                 if (!symbol.IsActive)
@@ -48,18 +52,57 @@ namespace RevitTool.Services
 
                 SetForegroundWindow(app.MainWindowHandle);
 
+                existingInstanceIds = GetInstanceIds(doc, symbol.Id);
                 uiDoc.PromptForFamilyInstancePlacement(symbol);
-
-                OnCompleted?.Invoke(true, "Đã đặt element thành công.");
+                CompletePlacement(doc, symbol, existingInstanceIds);
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException)
             {
-                OnCompleted?.Invoke(false, "Đã hủy thao tác đặt.");
+                CompletePlacement(doc, symbol, existingInstanceIds);
             }
             catch (Exception ex)
             {
                 OnCompleted?.Invoke(false, "Lỗi khi đặt element:\n\n" + ex.Message);
             }
+        }
+
+        private void CompletePlacement(Document doc, FamilySymbol symbol, HashSet<ElementId> existingInstanceIds)
+        {
+            List<FamilyInstance> addedInstances = new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .Cast<FamilyInstance>()
+                .Where(instance => instance.Symbol?.Id == symbol.Id && !existingInstanceIds.Contains(instance.Id))
+                .OrderBy(instance => instance.Id.Value)
+                .ToList();
+
+            if (addedInstances.Count == 0)
+            {
+                OnCompleted?.Invoke(false, "Đã hủy thao tác đặt.");
+                return;
+            }
+
+            FamilyInstance instance = addedInstances[^1];
+            string levelName = doc.GetElement(instance.LevelId)?.Name ?? "N/A";
+            string message =
+                $"Đã thêm {addedInstances.Count} element.\n\n" +
+                $"Name: {instance.Name}\n" +
+                $"Element ID: {instance.Id.Value}\n" +
+                $"Category: {instance.Category?.Name ?? "N/A"}\n" +
+                $"Level: {levelName}";
+
+            OnCompleted?.Invoke(true, message);
+        }
+
+        private static HashSet<ElementId> GetInstanceIds(Document doc, ElementId symbolId)
+        {
+            return new FilteredElementCollector(doc)
+                .OfClass(typeof(FamilyInstance))
+                .WhereElementIsNotElementType()
+                .Cast<FamilyInstance>()
+                .Where(instance => instance.Symbol?.Id == symbolId)
+                .Select(instance => instance.Id)
+                .ToHashSet();
         }
 
         public string GetName()

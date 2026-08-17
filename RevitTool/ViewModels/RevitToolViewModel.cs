@@ -68,11 +68,6 @@ namespace RevitTool.ViewModels
 
         public ElementTabViewModel<RebarModel> Rebars { get; }
 
-        [RelayCommand]
-        private void AddWall()
-        {
-            OpenAddWindow(BuiltInCategory.OST_Walls, "Add Wall", () => Walls.RefreshCommand.Execute(null));
-        }
 
         [RelayCommand]
         private void AddColumn()

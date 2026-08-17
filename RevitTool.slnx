@@ -11,5 +11,17 @@
     <BuildType Name="Release.R26" />
     <BuildType Name="Release.R27" />
   </Configurations>
+  <Project Path="RevitTool.Web/RevitTool.Web.csproj" Id="37336581-adb0-4ba9-a1fe-f3e6134f2861">
+    <BuildType Solution="Debug.R23|*" Project="Debug" />
+    <BuildType Solution="Debug.R24|*" Project="Debug" />
+    <BuildType Solution="Debug.R25|*" Project="Debug" />
+    <BuildType Solution="Debug.R26|*" Project="Debug" />
+    <BuildType Solution="Debug.R27|*" Project="Debug" />
+    <BuildType Solution="Release.R23|*" Project="Release" />
+    <BuildType Solution="Release.R24|*" Project="Release" />
+    <BuildType Solution="Release.R25|*" Project="Release" />
+    <BuildType Solution="Release.R26|*" Project="Release" />
+    <BuildType Solution="Release.R27|*" Project="Release" />
+  </Project>
   <Project Path="RevitTool/RevitTool.csproj" />
 </Solution>
