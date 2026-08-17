@@ -8,6 +8,8 @@ namespace RevitTool.Models
 
         public required string Name { get; init; }
 
+        public required string Level { get; init; }
+
         public double Width { get; init; }
 
         public double Height { get; init; }
