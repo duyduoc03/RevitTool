@@ -2,7 +2,6 @@
 using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DocumentFormat.OpenXml.Wordprocessing;
 using RevitTool.Models;
 using RevitTool.Services;
 using System;
@@ -19,20 +18,17 @@ namespace RevitTool.ViewModels
     {
         private readonly FamilyTypeService typeService = new();
         private readonly BuiltInCategory category;
-        private readonly PlaceFamilyInstanceHandler placeHandler;
-        private readonly ExternalEvent placeEvent;
+        private readonly RevitEventHandler revitEvent;
         private readonly Action onPlaced;
 
         public AddFamilyInstanceViewModel(
             BuiltInCategory category,
             string title,
-            PlaceFamilyInstanceHandler placeHandler,
-            ExternalEvent placeEvent,
+            RevitEventHandler revitEvent,
             Action onPlaced = null)
         {
             this.category = category;
-            this.placeHandler = placeHandler;
-            this.placeEvent = placeEvent;
+            this.revitEvent = revitEvent;
             this.onPlaced = onPlaced;
 
             Title = title;
@@ -53,7 +49,7 @@ namespace RevitTool.ViewModels
 
         private void LoadTypes()
         {
-            Autodesk.Revit.DB.Document doc = Context.ActiveDocument;
+            Document doc = Context.ActiveDocument;
 
             if (doc == null)
             {
@@ -68,11 +64,57 @@ namespace RevitTool.ViewModels
         {
             IsPlacing = true;
 
-            // Gán callback ngay trước khi Raise vì handler dùng chung cho mọi cửa sổ Add
-            // (Door/Furniture/Beam...), tránh trường hợp 2 cửa sổ mở song song ghi đè callback của nhau.
-            placeHandler.OnCompleted = OnPlacementCompleted;
-            placeHandler.FamilyTypeId = SelectedType.Id;
-            placeEvent.Raise();
+            // Chụp lại giá trị đang chọn trước khi vào lambda - tránh phụ thuộc vào
+            // SelectedType có thể đổi trong lúc chờ Revit xử lý.
+            ElementId typeId = SelectedType.Id;
+
+            revitEvent.Run(app =>
+            {
+                UIDocument uiDoc = app.ActiveUIDocument;
+                Document doc = uiDoc?.Document;
+
+                if (uiDoc == null || doc == null)
+                {
+                    Complete(false, "Không tìm thấy tài liệu Revit đang mở.");
+                    return;
+                }
+
+                FamilySymbol symbol = doc.GetElement(typeId) as FamilySymbol;
+
+                if (symbol == null)
+                {
+                    Complete(false, "Loại family không hợp lệ hoặc đã bị xóa.");
+                    return;
+                }
+
+                try
+                {
+                    if (!symbol.IsActive)
+                    {
+                        using (Transaction t = new Transaction(doc, "Activate Family Type"))
+                        {
+                            t.Start();
+                            symbol.Activate();
+                            doc.Regenerate();
+                            t.Commit();
+                        }
+                    }
+
+                    RevitWindowHelper.BringToFront(app);
+
+                    uiDoc.PromptForFamilyInstancePlacement(symbol);
+
+                    Complete(true, "Đã đặt element thành công.");
+                }
+                catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+                {
+                    Complete(false, "Đã hủy thao tác đặt.");
+                }
+                catch (Exception ex)
+                {
+                    Complete(false, "Lỗi khi đặt element:\n\n" + ex.Message);
+                }
+            });
         }
 
         private bool CanPlace() => SelectedType != null && !IsPlacing;
@@ -87,7 +129,7 @@ namespace RevitTool.ViewModels
             PlaceCommand.NotifyCanExecuteChanged();
         }
 
-        private void OnPlacementCompleted(bool success, string message)
+        private void Complete(bool success, string message)
         {
             IsPlacing = false;
 

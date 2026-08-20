@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace RevitTool.Services
 {
-    public class PlaceFamilyInstanceHandler : IExternalEventHandler
+    public class SheetService : IExternalEventHandler
     {
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);

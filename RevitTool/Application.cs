@@ -24,6 +24,10 @@ namespace RevitTool
             panel.AddPushButton<StartupCommand>("Execute")
                 .SetImage("/RevitTool;component/Resources/Icons/RibbonIcon16.png")
                 .SetLargeImage("/RevitTool;component/Resources/Icons/RibbonIcon32.png");
+
+            panel.AddPushButton<AnotherCommand>("Được")
+                .SetImage("/RevitTool;component/Resources/Icons/IconDuoc.png")
+                .SetLargeImage("/RevitTool;component/Resources/Icons/IconDuoc.png");
         }
     }
 }

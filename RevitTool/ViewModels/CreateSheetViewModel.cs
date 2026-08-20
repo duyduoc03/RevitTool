@@ -1,20 +1,20 @@
 ﻿using Autodesk.Revit.UI;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DocumentFormat.OpenXml.Spreadsheet;
+using RevitTool.Models;
 using RevitTool.Services;
+using System.Windows;
 
 namespace RevitTool.ViewModels
 {
     public sealed partial class CreateSheetViewModel : ObservableObject
     {
-        private readonly CreateSheetHandler handler;
-        private readonly ExternalEvent createEvent;
+        private readonly SheetService sheetService = new();
+        private readonly RevitEventHandler revitEvent;
 
-        public CreateSheetViewModel(CreateSheetHandler handler, ExternalEvent createEvent)
+        public CreateSheetViewModel(RevitEventHandler revitEvent)
         {
-            this.handler = handler;
-            this.createEvent = createEvent;
+            this.revitEvent = revitEvent;
         }
 
         [ObservableProperty]
@@ -28,9 +28,19 @@ namespace RevitTool.ViewModels
         {
             IsCreating = true;
 
-            handler.OnCompleted = OnCreateCompleted;
-            handler.SheetName = SheetName;
-            createEvent.Raise();
+            string name = SheetName;
+
+            revitEvent.Run(app =>
+            {
+                UIDocument uiDoc = app.ActiveUIDocument;
+                OperationResult result = sheetService.CreateSheet(uiDoc?.Document, uiDoc?.ActiveView, name);
+
+                IsCreating = false;
+
+                // TaskDialog hợp lý ở đây vì Sheet vừa tạo xong nằm trong Revit -
+                // user cần quay lại Revit để thấy kết quả, khác với Export không cần.
+                TaskDialog.Show("Create Sheet", result.Message);
+            });
         }
 
         private bool CanCreate() => !string.IsNullOrWhiteSpace(SheetName) && !IsCreating;
@@ -43,15 +53,6 @@ namespace RevitTool.ViewModels
         partial void OnIsCreatingChanged(bool value)
         {
             CreateCommand.NotifyCanExecuteChanged();
-        }
-
-        private void OnCreateCompleted(bool success, string message)
-        {
-            IsCreating = false;
-
-            // TaskDialog hợp lý ở đây vì Sheet vừa tạo xong nằm trong Revit -
-            // user cần quay lại Revit để thấy kết quả, khác với Export không cần.
-            TaskDialog.Show("Create Sheet", message);
         }
     }
 }

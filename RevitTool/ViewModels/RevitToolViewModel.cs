@@ -6,39 +6,25 @@ using RevitTool.Models;
 using RevitTool.Services;
 using RevitTool.Views;
 using System;
+using System.Collections.Generic;
+using System.Windows;
 
 namespace RevitTool.ViewModels
 {
     public sealed partial class RevitToolViewModel : ObservableObject
     {
-        private readonly SelectElementHandler selectElementHandler = new();
-        private readonly ExternalEvent selectElementEvent;
-
-        private readonly PlaceFamilyInstanceHandler placeFamilyInstanceHandler = new();
-        private readonly ExternalEvent placeFamilyInstanceEvent;
-
-        private readonly CreateSheetHandler createSheetHandler = new();
-        private readonly ExternalEvent createSheetEvent;
+        // 1 handler dùng chung cho MỌI thao tác Revit (select, place, create sheet, sửa parameter...)
+        // thay vì mỗi thao tác 1 class Handler riêng - pattern lấy từ FirstTool.
+        private readonly RevitEventHandler revitEvent = new();
 
         private readonly WallService wallService = new();
-        private readonly ColumnService columnService = new();
-        private readonly BeamService beamService = new();
         private readonly DoorService doorService = new();
         private readonly FurnitureService furnitureService = new();
         private readonly RebarService rebarService = new();
 
         public RevitToolViewModel()
         {
-            // ExternalEvent.Create bắt buộc phải chạy trong ngữ cảnh API hợp lệ
-            // (đang chạy vì đây là constructor được gọi trong StartupCommand.Execute()).
-            // Tạo 1 lần duy nhất ở đây, dùng lại cho mọi cửa sổ Add mở sau này (Door/Furniture/Beam...).
-            selectElementEvent = ExternalEvent.Create(selectElementHandler);
-            placeFamilyInstanceEvent = ExternalEvent.Create(placeFamilyInstanceHandler);
-            createSheetEvent = ExternalEvent.Create(createSheetHandler);
-
             Walls = new ElementTabViewModel<WallModel>(wallService.GetWalls);
-            Columns = new ElementTabViewModel<ColumnModel>(columnService.GetColumns);
-            Beams = new ElementTabViewModel<BeamModel>(beamService.GetBeams);
             Doors = new ElementTabViewModel<DoorModel>(doorService.GetDoors);
             Furniture = new ElementTabViewModel<FurnitureModel>(furnitureService.GetFurniture);
             Rebars = new ElementTabViewModel<RebarModel>(rebarService.GetRebars);
@@ -52,15 +38,45 @@ namespace RevitTool.ViewModels
                 return;
             }
 
-            selectElementHandler.ElementId = element.Id;
-            selectElementEvent.Raise();
+            ElementId elementId = element.Id;
+
+            revitEvent.Run(app =>
+            {
+                UIDocument uiDoc = app.ActiveUIDocument;
+
+                if (uiDoc == null)
+                {
+                    return;
+                }
+
+                uiDoc.Selection.SetElementIds(new List<ElementId> { elementId });
+                uiDoc.ShowElements(elementId);
+                RevitWindowHelper.BringToFront(app);
+            });
+        }
+
+        [RelayCommand]
+        private void EditParameter(IElementModel element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            OpenModelessWindow(
+                () => new EditParameterView(new EditParameterViewModel(element.Id, element.Name, revitEvent, RefreshAllTabs)),
+                "Sửa Parameter");
+        }
+
+        private void RefreshAllTabs()
+        {
+            Walls.RefreshCommand.Execute(null);
+            Doors.RefreshCommand.Execute(null);
+            Furniture.RefreshCommand.Execute(null);
+            Rebars.RefreshCommand.Execute(null);
         }
 
         public ElementTabViewModel<WallModel> Walls { get; }
-
-        public ElementTabViewModel<ColumnModel> Columns { get; }
-
-        public ElementTabViewModel<BeamModel> Beams { get; }
 
         public ElementTabViewModel<DoorModel> Doors { get; }
 
@@ -68,59 +84,41 @@ namespace RevitTool.ViewModels
 
         public ElementTabViewModel<RebarModel> Rebars { get; }
 
-
-        [RelayCommand]
-        private void AddColumn()
-        {
-            OpenAddWindow(BuiltInCategory.OST_StructuralColumns, "Add Column", () => Columns.RefreshCommand.Execute(null));
-        }
-
-        [RelayCommand]
-        private void AddBeam()
-        {
-            OpenAddWindow(BuiltInCategory.OST_StructuralFraming, "Add Beam", () => Beams.RefreshCommand.Execute(null));
-        }
-
         [RelayCommand]
         private void AddDoor()
         {
-            OpenAddWindow(BuiltInCategory.OST_Doors, "Add Door", () => Doors.RefreshCommand.Execute(null));
+            OpenModelessWindow(
+                () => new AddFamilyInstanceView(new AddFamilyInstanceViewModel(BuiltInCategory.OST_Doors, "Add Door", revitEvent, () => Doors.RefreshCommand.Execute(null))),
+                "Add Door");
         }
 
         [RelayCommand]
         private void AddFurniture()
         {
-            OpenAddWindow(BuiltInCategory.OST_Furniture, "Add Furniture", () => Furniture.RefreshCommand.Execute(null));
+            OpenModelessWindow(
+                () => new AddFamilyInstanceView(new AddFamilyInstanceViewModel(BuiltInCategory.OST_Furniture, "Add Furniture", revitEvent, () => Furniture.RefreshCommand.Execute(null))),
+                "Add Furniture");
         }
 
+        // Sau này thêm Beam/Column chỉ cần thêm 1 command tương tự AddDoor/AddFurniture,
+        // đổi BuiltInCategory - không cần View/ViewModel mới.
 
         [RelayCommand]
         private void CreateSheet()
         {
-            try
-            {
-                var viewModel = new CreateSheetViewModel(createSheetHandler, createSheetEvent);
-                var view = new CreateSheetView(viewModel);
-
-                view.Show();
-                view.Activate();
-            }
-            catch (Exception ex)
-            {
-                System.Windows.MessageBox.Show(
-                    "Không thể mở cửa sổ Create Sheet.\n\n" + ex.Message,
-                    "Create Sheet",
-                    System.Windows.MessageBoxButton.OK,
-                    System.Windows.MessageBoxImage.Error);
-            }
+            OpenModelessWindow(
+                () => new CreateSheetView(new CreateSheetViewModel(revitEvent)),
+                "Create Sheet");
         }
 
-        private void OpenAddWindow(BuiltInCategory category, string title, Action onPlaced)
+        /// <summary>
+        ///     Dùng chung cho mọi cửa sổ modeless (Add Door/Furniture, Create Sheet, Sửa Parameter...).
+        /// </summary>
+        private void OpenModelessWindow(Func<System.Windows.Window> factory, string errorTitle)
         {
             try
             {
-                var viewModel = new AddFamilyInstanceViewModel(category, title, placeFamilyInstanceHandler, placeFamilyInstanceEvent, onPlaced);
-                var view = new AddFamilyInstanceView(viewModel);
+                System.Windows.Window view = factory();
 
                 view.Show();
                 view.Activate();
@@ -129,7 +127,7 @@ namespace RevitTool.ViewModels
             {
                 System.Windows.MessageBox.Show(
                     "Không thể mở cửa sổ.\n\n" + ex.Message,
-                    title,
+                    errorTitle,
                     System.Windows.MessageBoxButton.OK,
                     System.Windows.MessageBoxImage.Error);
             }
